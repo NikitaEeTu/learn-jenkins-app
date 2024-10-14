@@ -30,9 +30,8 @@ pipeline {
                 '''
             }
         }
-    }
 
-    stage('Teest') {
+    stage('Test') {
             agent {
                 docker {
                     image 'node:14'
@@ -46,4 +45,5 @@ pipeline {
                 '''
             }
         }
+}
 }

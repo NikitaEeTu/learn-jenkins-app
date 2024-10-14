@@ -31,4 +31,20 @@ pipeline {
             }
         }
     }
+
+    stage('Teest') {
+            agent {
+                docker {
+                    image 'node:14'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                test -f build/index.html
+                npm test
+                '''
+            }
+        }
+    }
 }

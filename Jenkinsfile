@@ -7,6 +7,7 @@ pipeline {
                 docker {
                     image 'node:14'
                     reuseNode true
+                    // Port mapping for the first container
                     args '-p 3001:3000'
                 }
             }
@@ -20,8 +21,8 @@ pipeline {
                 export NPM_CONFIG_USERCONFIG=/tmp/.npmrc
                 export PATH=$PATH:/tmp/.npm-global/bin
 
-                # Run the application on port 3000 inside the container
-                npm start -- --port 3000
+                # Start the application in detached mode
+                npm run start -- --port 3000 &
                 '''
             }
         }
@@ -31,6 +32,7 @@ pipeline {
                 docker {
                     image 'node:14'
                     reuseNode true
+                    // Port mapping for the second container
                     args '-p 3002:3000'
                 }
             }
@@ -44,8 +46,8 @@ pipeline {
                 export NPM_CONFIG_USERCONFIG=/tmp/.npmrc
                 export PATH=$PATH:/tmp/.npm-global/bin
 
-                # Run the application on port 3000 inside the container (but exposed as 3002)
-                npm start -- --port 3000
+                # Start the application in detached mode
+                npm run start -- --port 3000 &
                 '''
             }
         }

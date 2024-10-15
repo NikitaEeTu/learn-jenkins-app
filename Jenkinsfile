@@ -21,7 +21,7 @@ pipeline {
         stage('Build Docker Image and Run Tests') {
             steps {
                 sh '''
-                docker build -f /home/nikita/docker -t my-node-app:latest .
+                docker build -f docker/Dockerfile -t my-node-app:latest .
                 '''
             }
         }

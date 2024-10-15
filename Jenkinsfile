@@ -12,50 +12,40 @@ pipeline {
             }
         }
 
-        stage('Run First Container on Port 3001') {
-            agent {
-                docker {
-                    image 'node:14'
-                    reuseNode true
-                    args '-p 3001:3000'
-                }
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/NikitaEeTu/learn-jenkins-app.git'
             }
+        }
+
+        stage('Build Docker Image and Run Tests') {
             steps {
                 sh '''
-                npm --version
-                node --version
+                docker build -f docker/Dockerfile -t my-node-app:latest .
+                '''
+            }
+        }
 
-                export NPM_CONFIG_CACHE=/tmp/.npm-cache
-                export NPM_CONFIG_PREFIX=/tmp/.npm-global
-                export NPM_CONFIG_USERCONFIG=/tmp/.npmrc
-                export PATH=$PATH:/tmp/.npm-global/bin
+         stage('Run Tests') {
+            steps {
+                sh '''
+                docker run --rm my-node-app:latest npm test
+                '''
+            }
+        }
 
-                # Start the application in detached mode
-                npm run start -- --port 3000 &
+        stage('Run First Container on Port 3001') {
+            steps {
+                sh '''
+                docker run -d --name node_app1 -p 3001:3000 my-node-app:latest
                 '''
             }
         }
 
         stage('Run Second Container on Port 3002') {
-            agent {
-                docker {
-                    image 'node:14'
-                    reuseNode true
-                    args '-p 3002:3000'
-                }
-            }
             steps {
                 sh '''
-                npm --version
-                node --version
-
-                export NPM_CONFIG_CACHE=/tmp/.npm-cache
-                export NPM_CONFIG_PREFIX=/tmp/.npm-global
-                export NPM_CONFIG_USERCONFIG=/tmp/.npmrc
-                export PATH=$PATH:/tmp/.npm-global/bin
-
-                # Start the application in detached mode
-                npm run start -- --port 3000 &
+                docker run -d --name node_app2 -p 3002:3000 my-node-app:latest
                 '''
             }
         }

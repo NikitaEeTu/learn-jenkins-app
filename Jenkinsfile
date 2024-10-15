@@ -2,12 +2,21 @@ pipeline {
     agent any
 
     stages {
+        stage('Clean Up Existing Containers') {
+            steps {
+                sh '''
+                # Stop and remove all running containers
+                docker stop $(docker ps -q) || true
+                docker rm $(docker ps -a -q) || true
+                '''
+            }
+        }
+
         stage('Run First Container on Port 3001') {
             agent {
                 docker {
                     image 'node:14'
                     reuseNode true
-                    // Port mapping for the first container
                     args '-p 3001:3000'
                 }
             }
@@ -32,7 +41,6 @@ pipeline {
                 docker {
                     image 'node:14'
                     reuseNode true
-                    // Port mapping for the second container
                     args '-p 3002:3000'
                 }
             }

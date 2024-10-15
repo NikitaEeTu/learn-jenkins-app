@@ -18,13 +18,15 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image and Run Tests') {
+timeout(time: 10, unit: 'MINUTES') {
+        stage('Build Docker Image') {
             steps {
                 sh '''
                 docker build -f docker/Dockerfile -t my-node-app:latest .
                 '''
             }
         }
+}
 
          stage('Run Tests') {
             steps {
